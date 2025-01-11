@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Candidate } from '../interfaces/Candidate.interface'; // Import the Candidate interface
 import CandidateSearch from "../pages/CandidateSearch";
 import SavedCandidates from '../pages/SavedCandidates';
 
@@ -38,13 +39,25 @@ function NavTabs({ currentPage, handlePageChange }: NavTabsProps) {
 //Function to create navigation bar
 const Nav = () => {
   const [currentPage, setCurrentPage] = useState('CandidateSearch');
-  
+  const [savedCandidates, setSavedCandidates] = useState<Candidate[]>([]);
+
   const renderPage = () => {
     if (currentPage === 'CandidateSearch') {
-      return <CandidateSearch />;
-    } else 
-      return <SavedCandidates />;
-    };
+        return (
+          <CandidateSearch 
+            savedCandidates={savedCandidates} 
+            setSavedCandidates={setSavedCandidates} 
+          />
+      );
+    } else {
+      return (
+        <SavedCandidates 
+          savedCandidates={savedCandidates} 
+          setSavedCandidates={setSavedCandidates}
+        />
+      );
+    }
+  };
   
   const handlePageChange = (page: string) => setCurrentPage(page);
   

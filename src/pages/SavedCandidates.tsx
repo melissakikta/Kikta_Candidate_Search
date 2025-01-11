@@ -13,6 +13,7 @@ type SavedCandidatesProps = {
   setSavedCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
 };
 
+
 const SavedCandidates = ({ savedCandidates, setSavedCandidates }: SavedCandidatesProps) => {
   const handleRemove = (username: string) => {
     setSavedCandidates(savedCandidates.filter((candidate) => candidate.username !== username));
@@ -51,7 +52,7 @@ const SavedCandidates = ({ savedCandidates, setSavedCandidates }: SavedCandidate
                   </a>
                 </td>
                 <td>{candidate.company || 'Not Available'}</td>
-                <td>
+                <td> {/* add button to remove saved candidate */}
                   <button onClick={() => handleRemove(candidate.username)}>Remove</button>
                 </td>
               </tr>

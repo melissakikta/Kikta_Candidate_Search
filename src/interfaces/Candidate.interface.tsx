@@ -1,5 +1,5 @@
 // Interface for the Candidate objects returned by the API
-export default interface Candidate {
+interface Candidate {
   readonly name: string;
   readonly username: string;
   readonly location: string;
@@ -8,4 +8,6 @@ export default interface Candidate {
   readonly html_url: string;
   readonly company: string;
   }
+
+export type { Candidate };
   
