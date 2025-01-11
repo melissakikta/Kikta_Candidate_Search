@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { searchGithub } from '../api/API';
+import { searchGithub, searchGithubUser } from '../api/API';
 
 type Candidate = {
   name: string;
@@ -11,22 +11,30 @@ type Candidate = {
   company: string;
 };
 
-const CandidateSearch = () => {
+type CandidateSearchProps = {
+  savedCandidates: Candidate[];
+  setSavedCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
+};
+
+const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearchProps) => {
   const [users, setUsers] = useState<Candidate[]>([]);
   const [currentIndex, setCurrentIndex] =useState(0);
-  const [SavedCandidates, setSavedCandidates] = useState<Candidate[]>([]); 
   const [search, setSearch] = useState<string>('');
 
   const handleSearch = async () => {
-    if (!search) {
-      alert('Please enter a search term');
-      return;
-    }
-
     try {
-      const response = await searchGithub(search);
-      setUsers(response);
-      setCurrentIndex(0); // Reset the current index
+      let response;
+      if (search.trim() === '') {
+        response = await searchGithub(); // Fetch random users
+      } else {
+        response = [await searchGithubUser(search)]; // Fetch specific user
+      }
+  
+      if (!response || response.length === 0) {
+        alert('No candidates found.');
+      } else {
+        setUsers(response);
+      }
     } catch (error) {
       console.error('Error fetching candidates:', error);
     }
@@ -34,19 +42,19 @@ const CandidateSearch = () => {
 
   const handleSave = () => {
     const candidate = users[currentIndex];
-    setSavedCandidates([...SavedCandidates, candidate]);
+    setSavedCandidates([...savedCandidates, candidate]);
     setCurrentIndex((prev) => (prev +1) % users.length);
   };
 
   const handleDismiss = () => {
-    setCurrentIndex((prev) => (prev +1) % users.length);
+    setCurrentIndex((prev) => (prev + 1) % users.length);
   };
   
   const currentCandidate = users[currentIndex];
 
   return (
     <div>
-      <h1>CandidateSearch</h1>
+      <h1>Candidate Search</h1>
       <div>
         <input
           type="text"
@@ -62,7 +70,7 @@ const CandidateSearch = () => {
           <h2>Current Candidate</h2>
           <h3>{currentCandidate.name || 'No Name Provided'}</h3>
           <p>Username: {currentCandidate.username}</p>
-          <p>Location: {currentCandidate.location || 'Unkown'}</p>
+          <p>Location: {currentCandidate.location || 'Unknown'}</p>
           <p>Email: {currentCandidate.email || 'No email provided'}</p>
           <p>Company: {currentCandidate.company || 'Not Available'}</p>
           <a href={currentCandidate.html_url} target="_blank" rel="noreferrer">

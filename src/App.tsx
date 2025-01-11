@@ -1,15 +1,32 @@
-import { Outlet } from 'react-router-dom';
-import Nav from './components/Nav';
+import { useState } from 'react';
+import CandidateSearch from './pages/CandidateSearch';
+import SavedCandidates from './pages/SavedCandidates';
 
-function App() {
+type Candidate = {
+  name: string;
+  username: string;
+  location: string;
+  avatar_url: string;
+  email: string;
+  html_url: string;
+  company: string;
+};
+
+const App = () => {
+  const [savedCandidates, setSavedCandidates] = useState<Candidate[]>([]);
+
   return (
-    <>
-      <Nav />
-      <main>
-        <Outlet />
-      </main>
-    </>
+    <div>
+      <CandidateSearch
+        savedCandidates={savedCandidates}
+        setSavedCandidates={setSavedCandidates}
+      />
+      <SavedCandidates
+        savedCandidates={savedCandidates}
+        setSavedCandidates={setSavedCandidates}
+      />
+    </div>
   );
-}
+};
 
 export default App;
