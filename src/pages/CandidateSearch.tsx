@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { searchGithub, searchGithubUser } from '../api/API';
 
 type Candidate = {
@@ -20,6 +20,25 @@ const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearc
   const [users, setUsers] = useState<Candidate[]>([]);
   const [currentIndex, setCurrentIndex] =useState(0);
   const [search, setSearch] = useState<string>('');
+  
+
+  // Fetch the initial set of candidates when the component mounts
+  useEffect(() => {
+    const fetchInitialCandidates = async () => {
+      try {
+        const response = await searchGithub(); // Fetch random users
+        if (response && response.length > 0) {
+          setUsers(response);
+        } else {
+          console.warn('No candidates found during initial fetch.');
+        }
+      } catch (error) {
+        console.error('Error fetching initial candidates:', error);
+      }
+    };
+
+    fetchInitialCandidates();
+  }, []);
 
   const handleSearch = async () => {
     try {
@@ -34,6 +53,7 @@ const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearc
         alert('No candidates found.');
       } else {
         setUsers(response);
+        setCurrentIndex(0);
       }
     } catch (error) {
       console.error('Error fetching candidates:', error);
@@ -42,7 +62,9 @@ const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearc
 
   const handleSave = () => {
     const candidate = users[currentIndex];
-    setSavedCandidates([...savedCandidates, candidate]);
+    if (!savedCandidates.some((saved: Candidate) => saved.username === candidate.username)) {
+      setSavedCandidates([...savedCandidates, candidate]);
+    }
     setCurrentIndex((prev) => (prev +1) % users.length);
   };
 
