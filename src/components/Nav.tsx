@@ -1,7 +1,38 @@
 import { useState } from 'react';
-import NavTabs from './NavTabs';
 import CandidateSearch from "../pages/CandidateSearch";
 import SavedCandidates from '../pages/SavedCandidates';
+
+type NavTabsProps = {
+  currentPage: string;
+  handlePageChange: (page: string) => void;
+};
+
+function NavTabs({ currentPage, handlePageChange }: NavTabsProps) {
+  return (
+    <nav>
+      <a
+        href="#CandidateSearch"
+        className={currentPage === 'CandidateSearch' ? 'active' : ''}
+        onClick={(e) => {
+          e.preventDefault(); // Prevent default navigation
+          handlePageChange('CandidateSearch');
+        }}
+      >
+        Candidate Search
+      </a>
+      <a
+        href="#SavedCandidates"
+        className={currentPage === 'SavedCandidates' ? 'active' : ''}
+        onClick={(e) => {
+          e.preventDefault();
+          handlePageChange('SavedCandidates');
+        }}
+      >
+        Saved Candidates
+      </a>
+    </nav>
+  );
+}
 
 
 //Function to create navigation bar
