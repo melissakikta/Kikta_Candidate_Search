@@ -13,7 +13,6 @@ const CandidateSearch = () => {
     try {
       const response = await searchGithub(); // Fetch random users
       if (response && response.length > 0) {
-        // console.log(response);
         setUsers(response.map((user: any) => user.login));
         const firstCandidate = await searchGithubUser(response[0].login);
         setCurrentCandidate(firstCandidate);
@@ -38,9 +37,7 @@ const CandidateSearch = () => {
         console.log(response);
 
         if (response) {
-          // setUsers(response.map((user: any) => user.login));
           setCurrentCandidate(response);
-          // setCurrentIndex(0);
         } else {
           console.warn('No candidates found during initial fetch.');
         }
@@ -68,7 +65,6 @@ const CandidateSearch = () => {
     setCurrentIndex(currentIndex + 1);
   };
   
-  // const currentCandidate = users[currentIndex];
 
   return (
     <div>
