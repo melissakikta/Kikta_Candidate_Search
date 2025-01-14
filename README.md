@@ -18,25 +18,19 @@ Navigating through the Candidate search application is userfriendly. The site wi
 
 <u><strong>Candidate's Infromation</strong></u>
 
-![Navigation](./src/assets/images/navigation.png)
+![Navigation](./src/assets/images/search.png)
 
 
 
-<u><strong>No more candidates message</strong></u>
+<u><strong>Saved Candidates Page</strong></u>
 
-![About Me](./src/assets/images/aboutme.png)
-
-
-
-<u><strong>Potential Candidates Page</strong></u>
-
-![Portfolio](./src/assets/images/portfolio.png)
+![Portfolio](./src/assets/images/saved.png)
 
 
 
 <u><strong>Np saved candidates message</strong></u>
 
-![Portfolio](./src/assets/images/skills.png)
+![Portfolio](./src/assets/images/no_saved.png)
 
 
 Back to [Table-of-Contents](#🚀-table-of-contents)
