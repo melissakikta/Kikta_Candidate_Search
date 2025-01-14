@@ -1,34 +1,47 @@
 import { useState, useEffect } from 'react';
 import { searchGithub, searchGithubUser } from '../api/API';
+import { Candidate } from '../interfaces/Candidate.interface';
+import SavedCandidates from './SavedCandidates';
 
-type Candidate = {
-  name: string;
-  username: string;
-  location: string;
-  avatar_url: string;
-  email: string;
-  html_url: string;
-  company: string;
-};
-
-type CandidateSearchProps = {
-  savedCandidates: Candidate[];
-  setSavedCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
-};
-
-const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearchProps) => {
-  const [users, setUsers] = useState<Candidate[]>([]);
+const CandidateSearch = () => {
+  const [users, setUsers] = useState<string []>([]);
   const [currentIndex, setCurrentIndex] =useState(0);
-  const [search, setSearch] = useState<string>('');
+  const [currentCandidate, setCurrentCandidate] = useState<Candidate | null>(null);
   
 
   // Fetch the initial set of candidates when the component mounts
+  const fetchInitialCandidates = async () => {
+    try {
+      const response = await searchGithub(); // Fetch random users
+      if (response && response.length > 0) {
+        // console.log(response);
+        setUsers(response.map((user: any) => user.login));
+        const firstCandidate = await searchGithubUser(response[0].login);
+        setCurrentCandidate(firstCandidate);
+        setCurrentIndex(0);
+      } else {
+        console.warn('No candidates found during initial fetch.');
+      }
+    } catch (error) {
+      console.error('Error fetching initial candidates:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchInitialCandidates = async () => {
+
+    fetchInitialCandidates();
+  }, []);
+
+  useEffect(() => {
+    const fetchCandidate = async () => {
       try {
-        const response = await searchGithub(); // Fetch random users
-        if (response && response.length > 0) {
-          setUsers(response);
+        const response = await searchGithubUser(users[currentIndex]);
+        console.log(response);
+
+        if (response) {
+          // setUsers(response.map((user: any) => user.login));
+          setCurrentCandidate(response);
+          // setCurrentIndex(0);
         } else {
           console.warn('No candidates found during initial fetch.');
         }
@@ -36,62 +49,37 @@ const CandidateSearch = ({ savedCandidates, setSavedCandidates }: CandidateSearc
         console.error('Error fetching initial candidates:', error);
       }
     };
-
-    fetchInitialCandidates();
-  }, []);
-
-  const handleSearch = async () => {
-    try {
-      let response;
-      if (search.trim() === '') {
-        response = await searchGithub(); // Fetch random users
-      } else {
-        response = [await searchGithubUser(search)]; // Fetch specific user
-      }
-  
-      if (!response || response.length === 0) {
-        alert('No candidates found.');
-      } else {
-        setUsers(response);
-        setCurrentIndex(0);
-      }
-    } catch (error) {
-      console.error('Error fetching candidates:', error);
-    }
-  };
+    currentIndex > 0 && fetchCandidate();
+  }, [currentIndex]);
 
   const handleSave = () => {
-    const candidate = users[currentIndex];
-    if (!savedCandidates.some((saved: Candidate) => saved.username === candidate.username)) {
-      setSavedCandidates([...savedCandidates, candidate]);
+    if (currentCandidate) {
+      console.log('Save button clicked');
+      const existingCandidates = JSON.parse(localStorage.getItem('savedCandidates') || '[]');
+      const updatedCandidates = [...existingCandidates, currentCandidate];
+      localStorage.setItem('savedCandidates', JSON.stringify(updatedCandidates));
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      console.warn('No candidate to save.');
     }
-    setCurrentIndex((prev) => (prev +1) % users.length);
   };
 
   const handleDismiss = () => {
-    setCurrentIndex((prev) => (prev + 1) % users.length);
+    console.log('Dismiss button clicked');
+    setCurrentIndex(currentIndex + 1);
   };
   
-  const currentCandidate = users[currentIndex];
+  // const currentCandidate = users[currentIndex];
 
   return (
     <div>
       <h1>Candidate Search</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Search for candidates"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
       {currentCandidate ? (
         <div className="candidate-card">
           <img src={currentCandidate.avatar_url} alt={`${currentCandidate.name}'s avatar`} />
           <h2>Current Candidate</h2>
           <h3>{currentCandidate.name || 'No Name Provided'}</h3>
-          <p>Username: {currentCandidate.username}</p>
+          <p>Username: {currentCandidate.login}</p>
           <p>Location: {currentCandidate.location || 'Unknown'}</p>
           <p>Email: {currentCandidate.email || 'No email provided'}</p>
           <p>Company: {currentCandidate.company || 'Not Available'}</p>

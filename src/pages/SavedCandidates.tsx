@@ -1,22 +1,22 @@
-type Candidate = {
-  name: string;
-  username: string;
-  location: string;
-  avatar_url: string;
-  email: string;
-  html_url: string;
-  company: string;
-};
-
-type SavedCandidatesProps = {
-  savedCandidates: Candidate[];
-  setSavedCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
-};
+import { useState, useEffect } from 'react';
+import { Candidate } from '../interfaces/Candidate.interface';
 
 
-const SavedCandidates = ({ savedCandidates, setSavedCandidates }: SavedCandidatesProps) => {
+const SavedCandidates = () => {
+  const [savedCandidates, setSavedCandidates] = useState<Candidate[]>([]);
+
+    useEffect(() => {
+      const storedCandidates = localStorage.getItem('savedCandidates');
+      console.log(storedCandidates);
+      if (storedCandidates) {
+        setSavedCandidates(JSON.parse(storedCandidates));
+      }
+    }, []);
+
   const handleRemove = (username: string) => {
-    setSavedCandidates(savedCandidates.filter((candidate) => candidate.username !== username));
+    const updatedCandidates = savedCandidates.filter((candidate) => candidate.login !== username);
+    setSavedCandidates(updatedCandidates);
+    localStorage.setItem('savedCandidates', JSON.stringify(updatedCandidates));
   };
 
   return (
@@ -38,12 +38,12 @@ const SavedCandidates = ({ savedCandidates, setSavedCandidates }: SavedCandidate
           </thead>
           <tbody>
             {savedCandidates.map((candidate) => (
-              <tr key={candidate.username}>
+              <tr key={candidate.login}>
                 <td>
                   <img src={candidate.avatar_url} alt={`${candidate.name}'s avatar`} width="50" />
                 </td>
                 <td>{candidate.name || 'No Name Provided'}</td>
-                <td>{candidate.username}</td>
+                <td>{candidate.login}</td>
                 <td>{candidate.location || 'Unknown'}</td>
                 <td>{candidate.email || 'No Email Provided'}</td>
                 <td>
@@ -52,8 +52,8 @@ const SavedCandidates = ({ savedCandidates, setSavedCandidates }: SavedCandidate
                   </a>
                 </td>
                 <td>{candidate.company || 'Not Available'}</td>
-                <td> {/* add button to remove saved candidate */}
-                  <button onClick={() => handleRemove(candidate.username)}>Remove</button>
+                <td> 
+                  <button onClick={() => handleRemove(candidate.login)}>Remove</button>
                 </td>
               </tr>
             ))}
